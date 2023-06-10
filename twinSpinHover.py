@@ -7,7 +7,7 @@ import threading as th
 
 kill_switch = False
 Z = 1.0 # hover height
-sleepRate = 10 # Hz
+sleepRate = 5 # Hz
 
 
 def key_capture_thread():
