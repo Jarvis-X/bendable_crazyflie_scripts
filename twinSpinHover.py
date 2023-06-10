@@ -7,7 +7,7 @@ import threading as th
 
 kill_switch = False
 Z = 1.0 # hover height
-sleepRate = 25 # Hz
+sleepRate = 10 # Hz
 
 
 def key_capture_thread():
@@ -16,7 +16,7 @@ def key_capture_thread():
     kill_switch = True
 
 
-def twinCircle(timeHelper, cfs, period, total_time):
+def twinSpin(timeHelper, cfs, period, total_time):
     """
     Make two crazyflie drones follow a circle trajectory, 
     centering at their initial center and keeping the distance
@@ -49,22 +49,12 @@ def twinCircle(timeHelper, cfs, period, total_time):
 
     # main loop
     start_time = timeHelper.time()
-    while (not kill_switch) and (timeHelper.time() - start_time < total_time):
+    while not kill_switch:
         time = timeHelper.time() - start_time
-        # phase_shift = omega * time
-        # if phase_shift >= np.pi:
-        #     phase_shift -= 2*np.pi
-        # elif phase_shift <= -np.pi:
-        #     phase_shift += 2*np.pi
 
         for i in range(num_robots):
-            desiredPos[i] = center + radius * np.array(
-                [np.cos(omega * time + (-1)**(i)*np.pi/2), 
-                 np.sin(omega * time + (-1)**(i)*np.pi/2), 
-                 0])
-
-            # cfs[i].goTo(goal=desiredPos[i], yaw=omega * time, duration=0.2)
             cfs[i].goTo(desiredPos[i], omega * time, 1/sleepRate)
+        
         timeHelper.sleepForRate(sleepRate)
 
 
@@ -76,6 +66,6 @@ if __name__ == "__main__":
     allcfs.takeoff(targetHeight=Z, duration=1.0+Z)
     timeHelper.sleep(5 + Z)
 
-    twinCircle(timeHelper, allcfs.crazyflies, period=10, total_time=30)
+    twinSpin(timeHelper, allcfs.crazyflies, period=10, total_time=30)
 
     allcfs.land(targetHeight=0.05, duration=1.0+Z, groupMask=0)
